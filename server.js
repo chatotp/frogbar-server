@@ -1,33 +1,22 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
+const fs = require('fs');
+const https = require('https');
+const { Server } = require('socket.io');
 
-const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const port = 3000;
+const options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.cert')
+}
 
-// TODO: Change this on production server!
-const allowedOrigins = ['http://localhost:5173']
-app.use(cors({
-    origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin))
-        {
-            callback(null, true);
-        }
-        else
-        {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
-}));
+const httpsServer = https.createServer(options);
+// TODO: Change this in prod!
+const io = new Server(httpsServer, {
+    cors: {
+        origin: "https://localhost:5173"
+    }
+})
 
 let players = {};
-
-// Redundant
-app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     console.log('A new player connected: ' + socket.id);
@@ -49,8 +38,6 @@ io.on('connection', (socket) => {
     })
 })
 
-const port = 3000;
-server.listen(port, () => {
-    // TODO: Change this!
-    console.log(`Server is running on http://localhost:${port}`)
+httpsServer.listen(3000, () => {
+    console.log(`Server is running on https://localhost:${port}`)
 })
