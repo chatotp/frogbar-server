@@ -19,22 +19,23 @@ const io = new Server(httpsServer, {
 let players = {};
 
 io.on('connection', (socket) => {
-    console.log('A new player connected: ' + socket.id);
 
     // send curr pos of other players to new client
     socket.emit('init', players);
 
     // listen for pos updates from client
     socket.on('updatePos', (position) => {
-        console.log('Player Pos Updated' + socket.id);
         players[socket.id] = position;
         io.emit('updateAll', players);
     })
 
     socket.on('disconnect', () => {
-        console.log('Player disconnected: ' + socket.id);
         delete players[socket.id];
         io.emit('disconnectPlayer', socket.id);
+    })
+
+    socket.on("chatMsg", (msg) => {
+        io.emit("chatMsg", { user: socket.id, msg });
     })
 })
 
