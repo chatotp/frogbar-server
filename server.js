@@ -16,6 +16,7 @@ const io = new Server(httpsServer, {
     }
 })
 
+// socketId : position
 let players = {};
 
 io.on('connection', (socket) => {
@@ -34,6 +35,7 @@ io.on('connection', (socket) => {
         io.emit('disconnectPlayer', socket.id);
     })
 
+    // listen for chat updates
     socket.on("chatMsg", (msg) => {
         io.emit("chatMsg", { user: socket.id, msg });
     })
