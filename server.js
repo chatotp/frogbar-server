@@ -21,12 +21,21 @@ let players = {};
 
 io.on('connection', (socket) => {
 
-    // send curr pos of other players to new client
-    socket.emit('init', players);
+    socket.on('setUserData', (data) => {
+        socket.emit('init', players);
+
+        players[socket.id] = { 
+            username: data.username || "Anonymous", 
+            color: data.color || "white", 
+            position: { x: 0, y: 0, z: 0 } 
+        };
+    });
 
     // listen for pos updates from client
     socket.on('updatePos', (position) => {
-        players[socket.id] = position;
+        if (players[socket.id]) {
+            players[socket.id].position = position;
+        }
         io.emit('updateAll', players);
     })
 
@@ -37,7 +46,7 @@ io.on('connection', (socket) => {
 
     // listen for chat updates
     socket.on("chatMsg", (msg) => {
-        io.emit("chatMsg", { user: socket.id, msg });
+        io.emit("chatMsg", { user: players[socket.id]?.username || "<NOUSERNAME>", color: players[socket.id]?.color, msg });
     })
 })
 
