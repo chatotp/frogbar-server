@@ -32,10 +32,20 @@ io.on('connection', (socket) => {
     });
 
     // listen for pos updates from client
-    socket.on('updatePos', (position) => {
-        if (players[socket.id]) {
-            players[socket.id].position = position;
-        }
+    socket.on('updatePos', (data) => {
+        if (players[socket.id] && data) {
+            players[socket.id].position = { 
+                x: data.position.x, 
+                y: data.position.y, 
+                z: data.position.z 
+            };
+
+            players[socket.id].rotation = {
+                _x: data.rotation._x,
+                _y: data.rotation._y,
+                _z: data.rotation._z
+            };
+        };
         io.emit('updateAll', players);
     })
 
