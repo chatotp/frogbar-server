@@ -5,11 +5,21 @@ const { generateContent } = require('./ai/gemini');
 
 const port = 3000;
 
-const httpServer = http.createServer();
+const httpServer = http.createServer((req, res) => {
+    // health check endpoint
+    if (req.method === "GET" && req.url === "/status") {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("OK");
+    } else {
+        // 404 for other routes
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("Not Found");
+    }
+});
 // TODO: Change this in prod!
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://frogbar.vercel.app"
+        origin: "https://frogbar.onrender.com"
     }
 })
 
