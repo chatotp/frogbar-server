@@ -1,25 +1,24 @@
-const fs = require('fs');
-const https = require('https');
+const http = require('http');
 const { Server } = require('socket.io');
 
 const { generateContent } = require('./ai/gemini');
 
 const port = 3000;
-const options = {
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.cert')
-}
 
-const httpsServer = https.createServer(options);
+const httpServer = http.createServer();
 // TODO: Change this in prod!
-const io = new Server(httpsServer, {
+const io = new Server(httpServer, {
     cors: {
-        origin: "https://localhost:5173"
+        origin: "http://localhost:5173"
     }
 })
 
-// socketId : position
+// socketId : position, rotation, hp, maxHP
 let players = {};
+
+// predefined
+const sunPosition = { x: 200, y: 0, z: 100 };
+const sunRadius = 50;
 
 io.on('connection', (socket) => {
     
@@ -73,7 +72,7 @@ io.on('connection', (socket) => {
         
         // Check if the message starts with "/ai"
         if (msg.startsWith("/ai")) {
-            const prompt = `${username} is at position (${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}) looking in direction (${rotation._x.toFixed(2)}, ${rotation._y.toFixed(2)}, ${rotation._z.toFixed(2)}). They say: "${msg.slice(3).trim()}"`;            
+            const prompt = `${username} is at position (${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}) looking in direction (${rotation._x.toFixed(2)}, ${rotation._y.toFixed(2)}, ${rotation._z.toFixed(2)}). The sun is positioned at (${sunPosition.x}, ${sunPosition.y}, ${sunPosition.z}). Other players' positions are: ${JSON.stringify(players)}. They say: "${msg.slice(3).trim()}"`;
             // Ensure a valid prompt exists
             if (prompt.length === 0) {
                 io.emit("chatMsg", { user: "System", color: "red", msg: "Please provide a prompt after /ai." });
@@ -93,10 +92,14 @@ io.on('connection', (socket) => {
 
     // player hit by bullet
     socket.on("playerHit", (playerId, damage) => {
-        if (players[playerId].hp > 0)
+        if (playerId !== socket.id)
         {
-            players[playerId].hp -= damage;
-            io.emit("updateHealth", playerId, damage);
+            if (players[playerId].hp > 0)
+                {
+                    players[playerId].hp -= damage;
+                    console.log(playerId);
+                    io.emit("updateHealth", playerId, damage);
+                }
         }
     });
 
@@ -106,6 +109,6 @@ io.on('connection', (socket) => {
     })
 });
 
-httpsServer.listen(port, () => {
-    console.log(`Server is running on https://localhost:${port}`)
+httpServer.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`)
 })
