@@ -99,6 +99,11 @@ io.on('connection', (socket) => {
             io.emit("updateHealth", playerId, damage);
         }
     });
+
+    // bullet emit
+    socket.on("emitBullet", (position, rotation, userColor) => {
+        socket.broadcast.emit("emitBulletPlayer", socket.id, position, rotation, userColor);
+    })
 });
 
 httpsServer.listen(port, () => {
