@@ -9,7 +9,7 @@ const httpServer = http.createServer();
 // TODO: Change this in prod!
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://frogbar.vercel.app/"
+        origin: "https://frogbar.vercel.app"
     }
 })
 
