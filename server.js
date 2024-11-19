@@ -31,6 +31,12 @@ const sunPosition = { x: 200, y: 0, z: 100 };
 const sunRadius = 50;
 
 io.on('connection', (socket) => {
+    // Check if the number of players exceeds 20
+    if (Object.keys(players).length >= 20) {
+        socket.emit('unauthorized', 'Maximum player limit reached. Try again later.');
+        socket.disconnect(); // Disconnect the new player
+        return;
+    }
     
     socket.on('setUserData', (data) => {
         socket.emit('init', players);
