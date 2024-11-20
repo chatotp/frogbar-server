@@ -1,8 +1,10 @@
 const http = require('http');
 const { Server } = require('socket.io');
-
 const { generateContent } = require('./ai/gemini');
 
+const { getAsteroids } = require('./db/setup');
+
+// Setup
 const port = 3000;
 
 const httpServer = http.createServer((req, res) => {
@@ -19,7 +21,7 @@ const httpServer = http.createServer((req, res) => {
 // TODO: Change this in prod!
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://frogbar.onrender.com"
+        origin: "http://localhost:5173"
     }
 })
 
@@ -38,8 +40,9 @@ io.on('connection', (socket) => {
         return;
     }
     
-    socket.on('setUserData', (data) => {
+    socket.on('setUserData', async (data) => {
         socket.emit('init', players);
+        socket.emit('initAsteroids',  await getAsteroids());
         
         players[socket.id] = { 
             username: data.username || "Anonymous", 
