@@ -21,7 +21,7 @@ const httpServer = http.createServer((req, res) => {
 // TODO: Change this in prod!
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:5173"
+        origin: "https://frogbar-beta.onrender.com"
     }
 })
 
