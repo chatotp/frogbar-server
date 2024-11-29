@@ -19,7 +19,7 @@ const httpServer = http.createServer((req, res) => {
 // TODO: Change this in prod!
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://frogbar.onrender.com"
+        origin: "http://localhost:5173"
     }
 })
 
@@ -28,7 +28,6 @@ let players = {};
 
 // predefined
 const sunPosition = { x: 200, y: 0, z: 100 };
-const sunRadius = 50;
 
 io.on('connection', (socket) => {
     // Check if the number of players exceeds 20
