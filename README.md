@@ -1,4 +1,4 @@
-# frogbar Client
+# frogbar Server
 ## Requirements
 
 The versions represent the versions used during the development phase.
@@ -7,7 +7,7 @@ The versions represent the versions used during the development phase.
 - Node.js \[22.9.0\]
 - GEMINI_API_KEY
 
-## Running the client
+## Running the server
 
 1. Set cors address of server to your domain or IP on which client is hosted.
 ```python
